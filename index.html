@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculador de Realidad v1.0</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+        }
+
+        body {
+            background-color: #050505;
+            background-image:
+                linear-gradient(rgba(29, 185, 84, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(29, 185, 84, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: #1DB954;
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 90%;
+            max-width: 400px;
+            z-index: 10;
+        }
+
+        /* TARJETA DE RESULTADO */
+        .card {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .label {
+            color: #6b6b6b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .result-number {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #1DB954;
+            line-height: 0.9;
+            display: block;
+            letter-spacing: -2px;
+        }
+
+        .result-unit {
+            font-size: 1rem;
+            color: #fff;
+            opacity: 0.8;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .progress-container {
+            margin-top: 25px;
+            background-color: rgba(255, 255, 255, 0.05);
+            height: 4px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background-color: #1DB954;
+            height: 100%;
+            width: 0%;
+            /* Dinámico */
+            box-shadow: 0 0 15px #1DB954;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #a0a0a0;
+            line-height: 1.5;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
+        strong {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* SECCIÓN DE INPUTS */
+        .inputs-section {
+            background: rgba(18, 18, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 5px;
+            margin-left: 10px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            padding: 12px 15px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: #1DB954;
+            box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+        }
+
+        /* Ocultar flechas de input number */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+
+        /* NUEVOS ESTILOS PARA EL TRACKER */
+        .tracker-section {
+            background: rgba(18, 18, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            /* Espacio entre calculadora y tracker */
+            width: 100%;
+        }
+
+        .tracker-title {
+            font-size: 0.8rem;
+            color: #6b6b6b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .habits-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            /* 7 Días */
+            gap: 8px;
+        }
+
+        .day-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-label {
+            font-size: 0.6rem;
+            color: #444;
+        }
+
+        /* El "Bit" de hábito */
+        .habit-bit {
+            width: 30px;
+            height: 30px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .habit-bit:hover {
+            border-color: #555;
+        }
+
+        /* ESTADOS ACTIVOS (GAMIFICACIÓN) */
+        .habit-bit.active {
+            background-color: #1DB954;
+            box-shadow: 0 0 10px rgba(29, 185, 84, 0.4);
+            border-color: #1DB954;
+        }
+
+        .habit-name {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #888;
+            text-align: left;
+            width: 100%;
+            display: grid;
+            grid-template-rows: repeat(3, 38px);
+            /* Alineado con los bits */
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="label">Libertad en</div>
+
+            <div>
+                <span class="result-number" id="monthsResult">--</span>
+                <span class="result-unit">MESES</span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <p class="message" id="messageResult">
+                Completá los datos para ver<br>tu fecha de salida.
+            </p>
+        </div>
+
+        <div class="inputs-section">
+            <div class="input-group">
+                <label class="input-label">Alquiler Objetivo ($)</label>
+                <input type="number" id="rentInput" placeholder="Ej: 300000" oninput="calculate()">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Ahorro Mensual Disponible ($)</label>
+                <input type="number" id="savingsInput" placeholder="Ej: 100000" oninput="calculate()">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Ahorros Actuales ($)</label>
+                <input type="number" id="currentSavingsInput" placeholder="Ej: 50000" oninput="calculate()">
+            </div>
+        </div>
+
+        <div class="tracker-section">
+            <div class="tracker-title">
+                Protocolos Diarios
+                <span style="font-size: 0.6rem; color: #333;">SEMANA ACTUAL</span>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <div class="habit-name">
+                    <div>💻 Code/Study</div>
+                    <div>🚫 No Socials</div>
+                    <div>📝 System Log</div>
+                </div>
+
+                <div class="habits-grid" id="gridContainer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 1. Obtener valores
+            const rent = parseFloat(document.getElementById('rentInput').value) || 0;
+            const monthlySavings = parseFloat(document.getElementById('savingsInput').value) || 0;
+            const currentSavings = parseFloat(document.getElementById('currentSavingsInput').value) || 0;
+
+            // 2. Definir Meta: Alquiler x 3.5 (Entrada estandar)
+            const goalAmount = rent * 3.5;
+
+            // 3. Validaciones simples
+            if (rent === 0 || monthlySavings === 0) {
+                document.getElementById('monthsResult').innerText = "--";
+                document.getElementById('progressBar').style.width = "0%";
+                document.getElementById('messageResult').innerHTML = "Faltan datos clave...";
+                return;
+            }
+
+            // 4. Calcular Meses Restantes
+            let remainingAmount = goalAmount - currentSavings;
+            if (remainingAmount < 0) remainingAmount = 0;
+
+            let months = Math.ceil(remainingAmount / monthlySavings);
+
+            // 5. Calcular Fecha Futura
+            const today = new Date();
+            today.setMonth(today.getMonth() + months);
+            const dateString = today.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+            // Capitalizar primera letra del mes
+            const finalDate = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+
+            // 6. Calcular Progreso %
+            let progress = (currentSavings / goalAmount) * 100;
+            if (progress > 100) progress = 100;
+
+            // 7. Actualizar DOM
+            document.getElementById('monthsResult').innerText = months;
+            document.getElementById('progressBar').style.width = progress + "%";
+
+            if (months === 0) {
+                document.getElementById('monthsResult').style.color = "#1DB954";
+                document.getElementById('messageResult').innerHTML = "¡Estás listo! <br><strong>Podés mudarte HOY.</strong>";
+            } else {
+                document.getElementById('monthsResult').style.color = "#1DB954";
+                document.getElementById('messageResult').innerHTML = `Llegás a la meta en <br><strong>${finalDate}</strong>`;
+            }
+        }
+
+
+        // CONFIGURACIÓN DEL TRACKER
+        const habitsCount = 3; // Cantidad de hábitos
+        const daysCount = 7;   // Días de la semana
+        const gridContainer = document.getElementById('gridContainer');
+        const dayLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+
+        // 1. GENERAR LA GRILLA AUTOMÁTICAMENTE
+        function renderGrid() {
+            gridContainer.innerHTML = '';
+
+            // Recuperar datos guardados
+            const savedData = JSON.parse(localStorage.getItem('habitData')) || {};
+
+            for (let d = 0; d < daysCount; d++) {
+                const col = document.createElement('div');
+                col.className = 'day-col';
+
+                // Etiqueta del día (L, M, M...)
+                const label = document.createElement('div');
+                label.className = 'day-label';
+                label.innerText = dayLetters[d];
+                col.appendChild(label);
+
+                // Crear los 3 bits (uno por hábito)
+                for (let h = 0; h < habitsCount; h++) {
+                    const bit = document.createElement('div');
+                    bit.className = 'habit-bit';
+
+                    // ID único: dia-habito (ej: 0-2 es Lunes, Hábito 3)
+                    const bitId = `${d}-${h}`;
+
+                    // Si estaba activo, ponerle la clase
+                    if (savedData[bitId]) {
+                        bit.className += ' active';
+                    }
+
+                    // Click Listener
+                    bit.onclick = () => toggleHabit(bit, bitId);
+
+                    col.appendChild(bit);
+                }
+                gridContainer.appendChild(col);
+            }
+        }
+
+        // 2. TOGGLE Y GUARDAR
+        function toggleHabit(element, id) {
+            element.classList.toggle('active');
+
+            // Guardar en LocalStorage
+            const savedData = JSON.parse(localStorage.getItem('habitData')) || {};
+
+            if (element.classList.contains('active')) {
+                savedData[id] = true;
+            } else {
+                delete savedData[id];
+            }
+
+            localStorage.setItem('habitData', JSON.stringify(savedData));
+        }
+
+        // INICIALIZAR
+        renderGrid();
+    </script>
+</body>
+
+</html>
