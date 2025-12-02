@@ -46,12 +46,26 @@
         }
 
         .container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+            width: 90%;
+            max-width: 1400px;
+            z-index: 10;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+        }
+
+        .left-column,
+        .right-column {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            width: 90%;
-            max-width: 400px;
-            z-index: 10;
         }
 
         /* TARJETA DE RESULTADO */
@@ -180,8 +194,6 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 20px;
             padding: 25px;
-            margin-top: 20px;
-            /* Espacio entre calculadora y tracker */
             width: 100%;
         }
 
@@ -248,60 +260,169 @@
             /* Alineado con los bits */
             align-items: center;
         }
+
+        /* ESTILOS FINANCIEROS */
+        .financial-section {
+            background: rgba(18, 18, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* Dos columnas: Inputs y Resultado */
+            gap: 20px;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .financial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Celular: Una abajo de otra */
+        }
+
+        .input-row {
+            margin-bottom: 10px;
+        }
+
+        .input-row label {
+            display: block;
+            font-size: 0.6rem;
+            color: #666;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .input-row input {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .input-row input:focus {
+            border-color: #1DB954;
+            outline: none;
+        }
+
+        .finance-result {
+            text-align: center;
+            background: #000;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #222;
+        }
+
+        .money-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 10px 0;
+        }
+
+        .burn-rate {
+            font-size: 0.7rem;
+            color: #888;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container">
-        <div class="card">
-            <div class="label">Libertad en</div>
+        <!-- Columna Izquierda: Calculadora -->
+        <div class="left-column">
+            <div class="card">
+                <div class="label">Libertad en</div>
 
-            <div>
-                <span class="result-number" id="monthsResult">--</span>
-                <span class="result-unit">MESES</span>
-            </div>
-
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-
-            <p class="message" id="messageResult">
-                Completá los datos para ver<br>tu fecha de salida.
-            </p>
-        </div>
-
-        <div class="inputs-section">
-            <div class="input-group">
-                <label class="input-label">Alquiler Objetivo ($)</label>
-                <input type="number" id="rentInput" placeholder="Ej: 300000" oninput="calculate()">
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">Ahorro Mensual Disponible ($)</label>
-                <input type="number" id="savingsInput" placeholder="Ej: 100000" oninput="calculate()">
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">Ahorros Actuales ($)</label>
-                <input type="number" id="currentSavingsInput" placeholder="Ej: 50000" oninput="calculate()">
-            </div>
-        </div>
-
-        <div class="tracker-section">
-            <div class="tracker-title">
-                Protocolos Diarios
-                <span style="font-size: 0.6rem; color: #333;">SEMANA ACTUAL</span>
-            </div>
-
-            <div style="display: flex; gap: 15px;">
-                <div class="habit-name">
-                    <div>💻 Code/Study</div>
-                    <div>🚫 No Socials</div>
-                    <div>📝 System Log</div>
+                <div>
+                    <span class="result-number" id="monthsResult">--</span>
+                    <span class="result-unit">MESES</span>
                 </div>
 
-                <div class="habits-grid" id="gridContainer">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <p class="message" id="messageResult">
+                    Completá los datos para ver<br>tu fecha de salida.
+                </p>
+            </div>
+
+            <div class="inputs-section">
+                <div class="input-group">
+                    <label class="input-label">Alquiler Objetivo ($)</label>
+                    <input type="number" id="rentInput" placeholder="Ej: 300000" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Ahorro Mensual Disponible ($)</label>
+                    <input type="number" id="savingsInput" placeholder="Ej: 100000" oninput="calculate()">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Ahorros Actuales ($)</label>
+                    <input type="number" id="currentSavingsInput" placeholder="Ej: 50000" oninput="calculate()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Tracker y Finanzas -->
+        <div class="right-column">
+            <div class="tracker-section">
+                <div class="tracker-title">
+                    Protocolos Diarios
+                    <span style="font-size: 0.6rem; color: #333;">SEMANA ACTUAL</span>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="habit-name">
+                        <div>💻 Code/Study</div>
+                        <div>🚫 No Socials</div>
+                        <div>📝 System Log</div>
+                    </div>
+
+                    <div class="habits-grid" id="gridContainer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="financial-section">
+                <div class="tracker-title">
+                    Flujo de Caja Mensual
+                    <span style="font-size: 0.6rem; color: #333;">REALTIME</span>
+                </div>
+
+                <div class="financial-grid">
+                    <div class="finance-inputs">
+                        <div class="input-row">
+                            <label>Ingreso Neto</label>
+                            <input type="number" id="incomeInput" placeholder="$" oninput="calcFinance()">
+                        </div>
+                        <div class="input-row">
+                            <label>Gastos Fijos</label>
+                            <input type="number" id="fixedInput" placeholder="Alquiler/Servicios" oninput="calcFinance()">
+                        </div>
+                        <div class="input-row">
+                            <label>Variable (Comida/Tarjeta)</label>
+                            <input type="number" id="variableInput" placeholder="Delivery/Ocio" oninput="calcFinance()">
+                        </div>
+                    </div>
+
+                    <div class="finance-result">
+                        <div class="label">Capacidad de Ahorro</div>
+                        <div class="money-display" id="savingsDisplay">$ --</div>
+                        <div class="burn-rate" id="burnRateDisplay">Burn Rate: --%</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -419,6 +540,60 @@
 
         // INICIALIZAR
         renderGrid();
+
+        // CÁLCULO FINANCIERO
+        function calcFinance() {
+            // 1. Obtener valores (o 0 si está vacío)
+            const income = parseFloat(document.getElementById('incomeInput').value) || 0;
+            const fixed = parseFloat(document.getElementById('fixedInput').value) || 0;
+            const variable = parseFloat(document.getElementById('variableInput').value) || 0;
+
+            // 2. Calcular Ahorro y Burn Rate
+            const totalExpenses = fixed + variable;
+            const savings = income - totalExpenses;
+
+            // Evitar división por cero
+            let burnRate = 0;
+            if (income > 0) {
+                burnRate = (totalExpenses / income) * 100;
+            }
+
+            // 3. Mostrar en Pantalla (Formato Moneda)
+            const savingsFormatted = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(savings);
+
+            const display = document.getElementById('savingsDisplay');
+            display.innerText = savingsFormatted;
+
+            document.getElementById('burnRateDisplay').innerText = `Burn Rate: ${burnRate.toFixed(1)}%`;
+
+            // 4. Cambiar color según salud financiera
+            if (savings > 0) {
+                display.style.color = "#1DB954"; // Verde (Profit)
+                display.style.textShadow = "0 0 10px rgba(29, 185, 84, 0.3)";
+            } else {
+                display.style.color = "#ff4444"; // Rojo (Déficit)
+                display.style.textShadow = "0 0 10px rgba(255, 68, 68, 0.3)";
+            }
+
+            // 5. Guardar en LocalStorage (Persistencia)
+            const financeData = { income, fixed, variable };
+            localStorage.setItem('financeData', JSON.stringify(financeData));
+        }
+
+        // CARGAR DATOS AL INICIAR
+        function loadFinance() {
+            const data = JSON.parse(localStorage.getItem('financeData'));
+            if (data) {
+                document.getElementById('incomeInput').value = data.income || '';
+                document.getElementById('fixedInput').value = data.fixed || '';
+                document.getElementById('variableInput').value = data.variable || '';
+                calcFinance(); // Recalcular con los datos cargados
+            }
+        }
+
+        // Agregar esta llamada al final de todo, junto con renderGrid()
+        loadFinance();
+
     </script>
 </body>
 
